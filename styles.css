@@ -2,29 +2,44 @@ body {
     font-family: Arial, sans-serif;
     text-align: center;
     background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
 }
 
 .container {
-    max-width: 800px;
-    margin: 0 auto;
+    max-width: 100%;
+    padding: 0 15px;
+    box-sizing: border-box;
 }
 
 #puzzleContainer {
-    width: 600px;
-    height: 600px;
+    width: 100%;
+    max-width: 400px;
+    height: 0;
+    padding-bottom: 100%;
     margin: 20px auto;
     position: relative;
     border: 2px solid #333;
 }
 
 .piece {
-    width: 100px;
-    height: 100px;
+    width: 25%;
+    height: 25%;
     position: absolute;
     cursor: pointer;
     user-select: none;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    background-size: 400px 400px; /* The same size as the container */
 }
 
 .hidden {
     display: none;
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
 }
