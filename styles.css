@@ -1,0 +1,30 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f0f0f0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+#puzzleContainer {
+    width: 600px;
+    height: 600px;
+    margin: 20px auto;
+    position: relative;
+    border: 2px solid #333;
+}
+
+.piece {
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    cursor: pointer;
+    user-select: none;
+}
+
+.hidden {
+    display: none;
+}
