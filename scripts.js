@@ -1,112 +1,70 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const ROWS = 4;
-    const COLS = 4;
-    const IMAGE_COUNT = 4;
-    const IMAGE_URLS = Array.from({ length: IMAGE_COUNT }, (_, i) => `images/image${i + 1}.jpg`);
+const imagesDirectory = 'images';
+const numberOfImages = 8; // You can change this value as needed
+const totalImagesAvailable = 20; // Total number of images available in the directory
 
-    // Randomly select an image URL from IMAGE_URLS array
-    const IMAGE_URL = IMAGE_URLS[Math.floor(Math.random() * IMAGE_URLS.length)];
+window.onload = function() {
+    const wheel = document.getElementById('wheel');
 
-    const puzzleContainer = document.getElementById('puzzleContainer');
-    const successMessage = document.getElementById('successMessage');
+    // Generate an array of indices and shuffle
+    let indices = Array.from({length: totalImagesAvailable}, (v, k) => k + 1);
+    indices = shuffleArray(indices).slice(0, numberOfImages);
+    console.log("indices chosen: " + indices);
 
-    let pieces = [];
-    let correctPieces = [];
-    let draggedPiece = null;
+    // Populate the wheel with images
+    indices.forEach((index, i) => {
+        console.log("image: image" + index);
+        console.log("transform angle: " + i * (360 / numberOfImages));
+        const segment = document.createElement('img');
+        segment.src = `${imagesDirectory}/image${index}.jpg`;
+        segment.className = 'segment';
+        segment.style.transform = `rotate(${i * (360 / numberOfImages)}deg)`;
+        segment.alt = `Design ${index}`;
+        wheel.appendChild(segment);
+    });
+};
 
-    function createPuzzle() {
-        pieces = [];
-        correctPieces = [];
-        puzzleContainer.innerHTML = '';
-
-        const pieceWidth = puzzleContainer.clientWidth / COLS;
-        const pieceHeight = puzzleContainer.clientHeight / ROWS;
-
-        for (let row = 0; row < ROWS; row++) {
-            for (let col = 0; col < COLS; col++) {
-                const x = col * pieceWidth;
-                const y = row * pieceHeight;
-                const piece = document.createElement('div');
-
-                piece.style.backgroundImage = `url(${IMAGE_URL})`;
-                piece.style.backgroundPosition = `-${x}px -${y}px`;
-                piece.classList.add('piece');
-
-                piece.style.width = `${pieceWidth}px`;
-                piece.style.height = `${pieceHeight}px`;
-                piece.style.top = `${Math.random() * (puzzleContainer.clientHeight - pieceHeight)}px`;
-                piece.style.left = `${Math.random() * (puzzleContainer.clientWidth - pieceWidth)}px`;
-
-                piece.dataset.correctX = `${x}px`;
-                piece.dataset.correctY = `${y}px`;
-
-                piece.addEventListener('mousedown', startDrag);
-                piece.addEventListener('mouseup', dropPiece);
-                piece.addEventListener('mousemove', dragPiece);
-
-                piece.addEventListener('touchstart', startDrag);
-                piece.addEventListener('touchend', dropPiece);
-                piece.addEventListener('touchmove', dragPiece);
-
-                pieces.push(piece);
-                puzzleContainer.appendChild(piece);
-            }
-        }
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
     }
+    return array;
+}
 
-    function startDrag(e) {
-        draggedPiece = e.target;
-        draggedPiece.style.zIndex = 1000;
+document.getElementById('spin-button').addEventListener('click', function() {
+    const button = this; // Reference to the button
+    const wheel = document.getElementById('wheel');
+    const resultContainer = document.getElementById('result-container');
+    const resultMessage = document.getElementById('result-message');
+    const chosenDesign = document.getElementById('chosen-design');
 
-        if (e.type === 'touchstart') {
-            const touch = e.touches[0];
-            e.clientX = touch.clientX;
-            e.clientY = touch.clientY;
-        }
-    }
+    resultMessage.textContent = '';
+    chosenDesign.src = '';
+    chosenDesign.alt = '';
 
-    function dropPiece(e) {
-        if (!draggedPiece) return;
+    // Hide the result container initially
+    resultContainer.style.display = 'none';
 
-        const correctX = parseInt(draggedPiece.dataset.correctX);
-        const correctY = parseInt(draggedPiece.dataset.correctY);
+    // Disable the button to prevent further clicks
+    button.disabled = true;
 
-        const rect = puzzleContainer.getBoundingClientRect();
-        const diffX = Math.abs(correctX - (draggedPiece.offsetLeft - rect.left));
-        const diffY = Math.abs(correctY - (draggedPiece.offsetTop - rect.top));
+    // Generate a random number for the rotation angle (0 to 360 degrees)
+    const randomRotation = Math.floor(Math.random() * 360) + 1800; // Ensures at least 5 full spins
+    wheel.style.transform = `rotate(${randomRotation}deg)`;
 
-        if (diffX < 20 && diffY < 20) {
-            draggedPiece.style.left = `${correctX}px`;
-            draggedPiece.style.top = `${correctY}px`;
-            correctPieces.push(draggedPiece);
-        }
+    setTimeout(() => {
+        const selectedAngle = randomRotation % 360;
+        const segmentAngle = 360 / numberOfImages;
+        let chosenSegment = Math.floor((selectedAngle + (segmentAngle / 2)) % 360 / segmentAngle);
+        // Correct for potential wrap-around
+        chosenSegment = (numberOfImages - chosenSegment) % numberOfImages;
 
-        draggedPiece.style.zIndex = 'auto';
-        draggedPiece = null;
+        const chosenImage = document.querySelectorAll('.segment')[chosenSegment];
+        resultMessage.textContent = `You chose: ${chosenImage.alt}`;
+        chosenDesign.src = chosenImage.src;
+        chosenDesign.alt = chosenImage.alt;
 
-        if (correctPieces.length === pieces.length) {
-            successMessage.classList.remove('hidden');
-        }
-    }
-
-    function dragPiece(e) {
-        if (!draggedPiece) return;
-
-        if (e.type === 'touchmove') {
-            const touch = e.touches[0];
-            e.clientX = touch.clientX;
-            e.clientY = touch.clientY;
-        }
-
-        const rect = puzzleContainer.getBoundingClientRect();
-        const x = e.clientX - rect.left - (draggedPiece.clientWidth / 2);
-        const y = e.clientY - rect.top - (draggedPiece.clientHeight / 2);
-
-        if (x < 0 || x > (puzzleContainer.clientWidth - draggedPiece.clientWidth) || y < 0 || y > (puzzleContainer.clientHeight - draggedPiece.clientHeight)) return;
-
-        draggedPiece.style.left = `${x}px`;
-        draggedPiece.style.top = `${y}px`;
-    }
-
-    createPuzzle();
+        // Show the result container now that a design is chosen
+        resultContainer.style.display = 'block';
+    }, 4000); // Wait for the transition to finish
 });
