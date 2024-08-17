@@ -76,8 +76,8 @@ document.getElementById('spin-button').addEventListener('click', function() {
         // console.log(`After correction chosenSegment:${chosenSegment}`)
 
         const chosenImage = document.querySelectorAll('.segment')[chosenSegment];
-        resultMessage.textContent = `You chose: ${chosenImage.alt}`;
-        console.log(`You chose: ${chosenImage.alt}`)
+        resultMessage.textContent = `You got: ${chosenImage.alt}`;
+        console.log(`You got: ${chosenImage.alt}`)
         chosenDesign.src = chosenImage.src;
         chosenDesign.alt = chosenImage.alt;
 
