@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sharmilee design puzzle</title>
+    <title>Sharmilee design spinner</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <div id="puzzleContainer"></div>
-        <div id="successMessage" class="hidden">
-            <h2>Congratulations! You've completed the puzzle!</h2>
-            <p>Screenshot this message to get 5% off on your next purchase!</p>
-        </div>
+    <div id="wheel-container">
+        <div id="marker">&#9660;</div>
+        <div id="wheel"></div>
+        <button id="spin-button">Spin the Wheel</button>
+    </div>
+    <div id="result-container">
+        <p id="result-message"></p>
+        <img id="chosen-design" alt="Chosen Design">
     </div>
     <script src="scripts.js"></script>
 </body>
