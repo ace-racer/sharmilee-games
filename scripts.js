@@ -1,6 +1,7 @@
 const imagesDirectory = 'images';
-const numberOfImages = 8; // You can change this value as needed
+const numberOfImages = 4; // You can change this value as needed
 const totalImagesAvailable = 20; // Total number of images available in the directory
+const markerAngle = 90; // marker is at the top
 
 window.onload = function() {
     const wheel = document.getElementById('wheel');
@@ -12,8 +13,8 @@ window.onload = function() {
 
     // Populate the wheel with images
     indices.forEach((index, i) => {
-        console.log("image: image" + index);
-        console.log("transform angle: " + i * (360 / numberOfImages));
+        //console.log("image: image" + index);
+        //console.log("transform angle: " + i * (360 / numberOfImages));
         const segment = document.createElement('img');
         segment.src = `${imagesDirectory}/image${index}.jpg`;
         segment.className = 'segment';
@@ -55,12 +56,28 @@ document.getElementById('spin-button').addEventListener('click', function() {
     setTimeout(() => {
         const selectedAngle = randomRotation % 360;
         const segmentAngle = 360 / numberOfImages;
-        let chosenSegment = Math.floor((selectedAngle + (segmentAngle / 2)) % 360 / segmentAngle);
+        const originalStartingCentroidAngle = segmentAngle / 2;
+        let chosenSegment = -1;
+        let nearestAngleToMarker = 1000000;
+        for (let i = 0; i < numberOfImages; i++){
+            let currentCentroidAngle = (selectedAngle + originalStartingCentroidAngle + (i * segmentAngle)) % 360;
+            let currentAngleDifference = Math.abs(currentCentroidAngle - markerAngle);
+            console.log(`The segment ${i} has currentCentroidAngle ${currentCentroidAngle} and angle difference ${currentAngleDifference} from marker at ${markerAngle}`);
+            if (currentAngleDifference < nearestAngleToMarker) {
+                console.log(`Updating the segment ${i} as nearest as it has lower angle difference than ${nearestAngleToMarker}`);
+                nearestAngleToMarker = currentAngleDifference;
+                chosenSegment = i;
+            }
+        }
+        // let chosenSegment = Math.floor((selectedAngle + (segmentAngle / 2)) % 360 / segmentAngle);
+        console.log(`selectedAngle: ${selectedAngle} segmentAngle: ${segmentAngle} chosenSegment:${chosenSegment}`)
         // Correct for potential wrap-around
-        chosenSegment = (numberOfImages - chosenSegment) % numberOfImages;
+        // chosenSegment = (numberOfImages - chosenSegment) % numberOfImages;
+        // console.log(`After correction chosenSegment:${chosenSegment}`)
 
         const chosenImage = document.querySelectorAll('.segment')[chosenSegment];
         resultMessage.textContent = `You chose: ${chosenImage.alt}`;
+        console.log(`You chose: ${chosenImage.alt}`)
         chosenDesign.src = chosenImage.src;
         chosenDesign.alt = chosenImage.alt;
 
